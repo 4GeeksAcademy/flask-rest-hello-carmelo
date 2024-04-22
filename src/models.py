@@ -83,20 +83,3 @@ class Vehicles(db.Model):
         }
 
 
-# class FavoriteCharacter(db.Model):
-#     id = db.Column(db.Integer, primary_key=True)
-#     name = db.Column(db.String(250),unique=False, nullable=False)
-#     model = db.Column(db.String(250),unique=False,nullable=False)
-#     vehicle_class = db.Column(db.String(250),unique=False,nullable=False)
-#     length = db.Column(db.String(250),unique=False,nullable=False)
-
-#     def __repr__(self):
-#         return '<Vehicules %r>' % self.name
-
-#     def serialize(self):
-#         return {
-#             "id": self.id,
-#             "name": self.name,
-#             # do not serialize the password, its a security breach
-#         }       
-    
