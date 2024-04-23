@@ -58,7 +58,7 @@ class Planets(db.Model):
             "name": self.name,
             "diameter":self.diameter,
             "rotation_period":self.rotation_period,
-            "orbtital_peiod":self.orbital_period
+            "orbital_period":self.orbital_period
             
         }
     

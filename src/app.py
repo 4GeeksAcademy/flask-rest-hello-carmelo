@@ -36,18 +36,23 @@ def handle_invalid_usage(error):
 def sitemap():
     return generate_sitemap(app)
 
+
+#Endopoints GET para obtener todos los resultados de las tablas
+#Endopint GET ALL de user
 @app.route('/user', methods=['GET'])
 def get_users():
 
     users_query = User.query.all()
     results_users = list(map(lambda item: item.serialize(), users_query))
-    print(results_users)
+    # print(results_users)
    
     if results_users == []:
      return jsonify({"msg":"user not found"}),404
     else:
      return jsonify(results_users), 200
-    
+
+
+#Endpoint GET ALL de characters
 @app.route('/characters', methods=['GET'])
 def get_characters():
 
@@ -59,7 +64,7 @@ def get_characters():
     else:
      return jsonify(results_characters), 200
     
-
+#Endopint GET ALL de planets
 @app.route('/planets', methods=['GET'])
 def get_planets():
 
@@ -71,7 +76,9 @@ def get_planets():
      return jsonify({"msg":"Planets not found"}),404
     else:
      return jsonify(results_planets), 200
-    
+
+
+#Endopint GET ALL de vehicles
 @app.route('/vehicles', methods=['GET'])
 def get_vehicles():
 
@@ -84,7 +91,8 @@ def get_vehicles():
     else:
      return jsonify(results_vehicles), 200
     
-
+#Todos los endopints para obtener por id 
+#Endopint GET by ID de user
 @app.route('/user/<int:user_id>', methods=['GET'])
 def get_one_user(user_id):
 
@@ -96,6 +104,197 @@ def get_one_user(user_id):
     else:
         return jsonify(user_query.serialize()), 200
     
+
+#Endpoint GET by ID de characters 
+@app.route('/characters/<int:characters_id>', methods=['GET'])
+def get_one_character(characters_id):
+
+    character_query = Characters.query.filter_by(id=characters_id).first()
+    
+   
+    if character_query is None:
+        return jsonify({"msg": "User not found"}), 404
+    else:
+        return jsonify(character_query.serialize()), 200
+    
+#Endopint GET by ID de planets
+
+@app.route('/planets/<int:planets_id>', methods=['GET'])
+def get_one_planet(planets_id):
+
+    planet_query = Planets.query.filter_by(id=planets_id).first()
+    
+   
+    if planet_query is None:
+        return jsonify({"msg": "User not found"}), 404
+    else:
+        return jsonify(planet_query.serialize()), 200
+
+#Endopint GET by ID de vehicles
+@app.route('/vehicles/<int:vehicles_id>', methods=['GET'])
+def get_one_vehicle(vehicles_id):
+
+    vehicle_query = Vehicles.query.filter_by(id=vehicles_id).first()
+    
+   
+    if vehicle_query is None:
+        return jsonify({"msg": "User not found"}), 404
+    else:
+        return jsonify(vehicle_query.serialize()), 200   
+
+#Todos los Endopoints POST
+#Endopint POST de user
+@app.route('/user/', methods=['POST'])
+def create_user():
+    body = request.json
+    user_query = User.query.filter_by(name=body["name"]).first()
+    
+    if user_query is not None:
+        return jsonify({"msg": "User already exists"}), 409
+    
+    new_user = User(name=body["name"], email=body["email"], password=body["password"],is_active=body["is_active"])
+    db.session.add(new_user)
+    db.session.commit()
+    
+
+    return jsonify({
+        "id": new_user.id,
+        "name": new_user.name,
+        "email": new_user.email,
+        "password":new_user.password,
+        "is_active":new_user.is_active
+    }), 201
+
+#Endpoint POST de characters
+@app.route('/characters/', methods=['POST'])
+def create_character():
+    body = request.json
+    character_query = Characters.query.filter_by(name=body["name"]).first()
+    
+    if character_query is not None:
+        return jsonify({"msg": "User already exists"}), 409
+    
+    new_character = Characters(name=body["name"], birth_year=body["birth_year"], eye_color=body["eye_color"],
+                               gender=body["gender"], hair_color=body["hair_color"])
+    db.session.add(new_character)
+    db.session.commit()
+    
+
+    return jsonify({
+        "id": new_character.id,
+        "name": new_character.name,
+        "birth_year": new_character.birth_year,
+        "eye_color":new_character.eye_color,
+        "gender":new_character.gender,
+        "hair_color":new_character.hair_color,
+    }), 201
+
+#Endpoint POST de planets
+@app.route('/planets/', methods=['POST'])
+def create_planet():
+    body = request.json
+    planet_query = Planets.query.filter_by(name=body["name"]).first()
+    
+    if planet_query is not None:
+        return jsonify({"msg": "User already exists"}), 409
+    
+    new_vehicle = Planets(name=body["name"], diameter=body["diameter"],
+                          rotation_period=body["rotation_period"], orbital_period=body["orbital_period"])
+    db.session.add(new_vehicle)
+    db.session.commit()
+    
+
+    return jsonify({
+        "id": new_vehicle.id,
+        "name": new_vehicle.name,
+        "diameter": new_vehicle.diameter,
+        "orbital_period":new_vehicle.orbital_period,
+        "rotation_period":new_vehicle.rotation_period
+    }), 201
+
+#Endpoint POST de vehicles
+@app.route('/vehicles/', methods=['POST'])
+def create_vehicle():
+    body = request.json
+    vehicle_query = Planets.query.filter_by(name=body["name"]).first()
+    
+    if vehicle_query is not None:
+        return jsonify({"msg": "User already exists"}), 409
+    
+    new_vehicle = Vehicles(name=body["name"], model=body["model"],
+                          vehicle_class=body["vehicle_class"], length=body["length"])
+    db.session.add(new_vehicle)
+    db.session.commit()
+    
+
+    return jsonify({
+        "id": new_vehicle.id,
+        "name": new_vehicle.name,
+        "model": new_vehicle.model,
+        "vehicle_class":new_vehicle.vehicle_class,
+        "length":new_vehicle.length
+    }), 201
+
+
+#Todos los Endopoints DELETE
+#Endopint DELETE de user 
+@app.route('/user/<int:user_id>/', methods=['DELETE'])
+def delete_user(user_id):
+
+    remove_user = User.query.get(user_id)
+    
+    if remove_user is None:
+        return jsonify({"msg": "User not found"}), 404
+    
+    db.session.delete(remove_user)
+    db.session.commit()
+    
+    return jsonify({"msg": "User deleted successfully"}), 200
+
+#Endopint DELETE de characters
+@app.route('/characters/<int:characters_id>/', methods=['DELETE'])
+def delete_character(characters_id):
+
+    remove_character = Characters.query.get(characters_id)
+    
+    if remove_character is None:
+        return jsonify({"msg": "User not found"}), 404
+    
+    db.session.delete(remove_character)
+    db.session.commit()
+    
+    return jsonify({"msg": "User deleted successfully"}), 200
+
+#Endopint DELETE de planets
+@app.route('/planets/<int:planets_id>/', methods=['DELETE'])
+def delete_planet(planets_id):
+
+    remove_planet = Planets.query.get(planets_id)
+    
+    if remove_planet is None:
+        return jsonify({"msg": "User not found"}), 404
+    
+    db.session.delete(remove_planet)
+    db.session.commit()
+    
+    return jsonify({"msg": "User deleted successfully"}), 200
+
+#Enpoint DELETE de vehicles
+@app.route('/vehicles/<int:vehicles_id>/', methods=['DELETE'])
+def delete_vehicle(vehicles_id):
+
+    remove_vehicle = Vehicles.query.get(vehicles_id)
+    
+    if remove_vehicle is None:
+        return jsonify({"msg": "User not found"}), 404
+    
+    db.session.delete(remove_vehicle)
+    db.session.commit()
+    
+    return jsonify({"msg": "User deleted successfully"}), 200
+
+
+ 
 
 
 
