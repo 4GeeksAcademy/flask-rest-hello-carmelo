@@ -3,6 +3,12 @@ from flask_admin import Admin
 from models import db, User,Characters,Planets,Vehicles,FavoriteCharacter,FavoritePlanet,FavoriteVehicle
 from flask_admin.contrib.sqla import ModelView
 
+
+#para que aparezca en la tabla, hay que escribir en el admin.add...
+class MyFavoritesView(ModelView):
+        column_list= ("usuario_id", "people_id")
+        form_columns = ("usuario_id", "people_id")
+
 def setup_admin(app):
     app.secret_key = os.environ.get('FLASK_APP_KEY', 'sample key')
     app.config['FLASK_ADMIN_SWATCH'] = 'cerulean'

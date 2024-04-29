@@ -9,7 +9,7 @@ from flask_cors import CORS
 from utils import APIException, generate_sitemap
 from admin import setup_admin
 from models import db, User, Characters , Planets, Vehicles,FavoriteCharacter,FavoritePlanet,FavoriteVehicle
-# from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required, JWTManager 
+from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required, JWTManager 
 
 app = Flask(__name__)
 app.url_map.strict_slashes = False
@@ -25,6 +25,10 @@ MIGRATE = Migrate(app, db)
 db.init_app(app)
 CORS(app)
 setup_admin(app)
+
+# Setup the Flask-JWT-Extended extension
+app.config["JWT_SECRET_KEY"] = "super-secret"  # Change this!
+jwt = JWTManager(app)
 
 # Handle/serialize errors like a JSON object
 @app.errorhandler(APIException)
@@ -387,7 +391,23 @@ def delete_favorite_vehicle(favoritevehicle_id):
     
     return jsonify({"msg": "Favorite deleted successfully"}), 200
 
+# Endpoint para Crear una ruta para autenticar a sus usuarios y devolver JWT.
+@app.route("/login", methods=["POST"])
+def login():
+    email = request.json.get("email", None)
+    password = request.json.get("password", None)
 
+    user_login_query = User.query.filter_by(email=email).first()
+    print(user_login_query)
+
+    if user_login_query is None:
+        return jsonify({"msg": "email does not exist"}), 404
+
+    if email != user_login_query.email or password != user_login_query.password:
+        return jsonify({"msg": "Bad username or password"}), 401
+
+    access_token = create_access_token(identity=email)
+    return jsonify(access_token=access_token)
 
 
 
