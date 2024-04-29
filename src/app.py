@@ -9,7 +9,7 @@ from flask_cors import CORS
 from utils import APIException, generate_sitemap
 from admin import setup_admin
 from models import db, User, Characters , Planets, Vehicles,FavoriteCharacter,FavoritePlanet,FavoriteVehicle
-#from models import Person
+# from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required, JWTManager 
 
 app = Flask(__name__)
 app.url_map.strict_slashes = False
@@ -172,7 +172,7 @@ def create_character():
     character_query = Characters.query.filter_by(name=body["name"]).first()
     
     if character_query is not None:
-        return jsonify({"msg": "User already exists"}), 409
+        return jsonify({"msg": "Character already exists"}), 409
     
     new_character = Characters(name=body["name"], birth_year=body["birth_year"], eye_color=body["eye_color"],
                                gender=body["gender"], hair_color=body["hair_color"])
@@ -196,7 +196,7 @@ def create_planet():
     planet_query = Planets.query.filter_by(name=body["name"]).first()
     
     if planet_query is not None:
-        return jsonify({"msg": "User already exists"}), 409
+        return jsonify({"msg": "Planets already exists"}), 409
     
     new_vehicle = Planets(name=body["name"], diameter=body["diameter"],
                           rotation_period=body["rotation_period"], orbital_period=body["orbital_period"])
@@ -219,7 +219,7 @@ def create_vehicle():
     vehicle_query = Planets.query.filter_by(name=body["name"]).first()
     
     if vehicle_query is not None:
-        return jsonify({"msg": "User already exists"}), 409
+        return jsonify({"msg": "Vehicle already exists"}), 409
     
     new_vehicle = Vehicles(name=body["name"], model=body["model"],
                           vehicle_class=body["vehicle_class"], length=body["length"])
@@ -258,12 +258,12 @@ def delete_character(characters_id):
     remove_character = Characters.query.get(characters_id)
     
     if remove_character is None:
-        return jsonify({"msg": "User not found"}), 404
+        return jsonify({"msg": "Character not found"}), 404
     
     db.session.delete(remove_character)
     db.session.commit()
     
-    return jsonify({"msg": "User deleted successfully"}), 200
+    return jsonify({"msg": "Character deleted successfully"}), 200
 
 #Endopint DELETE de planets
 @app.route('/planets/<int:planets_id>/', methods=['DELETE'])
@@ -272,12 +272,12 @@ def delete_planet(planets_id):
     remove_planet = Planets.query.get(planets_id)
     
     if remove_planet is None:
-        return jsonify({"msg": "User not found"}), 404
+        return jsonify({"msg": "Planets not found"}), 404
     
     db.session.delete(remove_planet)
     db.session.commit()
     
-    return jsonify({"msg": "User deleted successfully"}), 200
+    return jsonify({"msg": "Planets deleted successfully"}), 200
 
 #Enpoint DELETE de vehicles
 @app.route('/vehicles/<int:vehicles_id>/', methods=['DELETE'])
@@ -292,6 +292,104 @@ def delete_vehicle(vehicles_id):
     db.session.commit()
     
     return jsonify({"msg": "User deleted successfully"}), 200
+
+
+#Endpoint get favorites de User 
+
+
+
+#Endopoints Post Favorite
+#Endpoint post favorite Character
+@app.route('/favoritecharacter/', methods=['POST'])
+def create_favorite_character():
+    body = request.json
+    favorite_character_query = FavoriteCharacter.query.filter_by(character_id=body["character_id"]).first()
+
+    if favorite_character_query is not None:
+        return jsonify({"msg": "Favorite already exists"}), 409
+    
+    new_character_favorite = FavoriteCharacter(character_id=body["character_id"], user_id=body["user_id"])
+    db.session.add(new_character_favorite)
+    db.session.commit()
+    return jsonify({"msg": "Favorite create"}), 200
+
+#Endpoint Post favorite planet
+@app.route('/favoriteplanet/', methods=['POST'])
+def create_favorite_planet():
+    body = request.json
+    favorite_planet_query = FavoritePlanet.query.filter_by(planet_id=body["planet_id"]).first()
+
+    if favorite_planet_query is not None:
+        return jsonify({"msg": "Favorite already exists"}), 409
+    
+    new_planet_favorite = FavoritePlanet(planet_id=body["planet_id"], user_id=body["user_id"])
+    db.session.add(new_planet_favorite)
+    db.session.commit()
+    return jsonify({"msg": "Favorite create"}), 200
+
+#Endopoint Post favorite vehicle
+@app.route('/favoritevehicle/', methods=['POST'])
+def create_favorite_vehicle():
+    body = request.json
+    favorite_vehicle_query = FavoriteVehicle.query.filter_by(vehicle_id=body["vehicle_id"]).first()
+
+    if favorite_vehicle_query is not None:
+        return jsonify({"msg": "Favorite already exists"}), 409
+    
+    new_vehicle_favorite = FavoriteVehicle(vehicle_id=body["vehicle_id"], user_id=body["user_id"])
+    db.session.add(new_vehicle_favorite)
+    db.session.commit()
+    return jsonify({"msg": "Favorite create"}), 200
+
+
+#Endopoints DELETE Favorite
+#Endpoint Delete favorite Character
+@app.route('/favoritecharacter/<int:favoritecharacter_id>/', methods=['DELETE'])
+def delete_favorite_character(favoritecharacter_id):
+
+    remove_favorite_character = FavoriteCharacter.query.get(favoritecharacter_id)
+    
+    if remove_favorite_character is None:
+        return jsonify({"msg": "Favorite not found"}), 404
+    print(remove_favorite_character)
+    
+    db.session.delete(remove_favorite_character)
+    db.session.commit()
+    
+    return jsonify({"msg": "Favorite deleted successfully"}), 200
+
+#Endpoint Delete favorite Planet
+@app.route('/favoriteplanet/<int:favoriteplanet_id>/', methods=['DELETE'])
+def delete_favorite_planet(favoriteplanet_id):
+
+    remove_favorite_planet = FavoritePlanet.query.get(favoriteplanet_id)
+    
+    if remove_favorite_planet is None:
+        return jsonify({"msg": "Favorite not found"}), 404
+    print(remove_favorite_planet)
+    
+    db.session.delete(remove_favorite_planet)
+    db.session.commit()
+    
+    return jsonify({"msg": "Favorite deleted successfully"}), 200
+#Endpoint Delete favorite vehicle
+@app.route('/favoritevehicle/<int:favoritevehicle_id>/', methods=['DELETE'])
+def delete_favorite_vehicle(favoritevehicle_id):
+
+    remove_favorite_vehicle = FavoriteVehicle.query.get(favoritevehicle_id)
+    
+    if remove_favorite_vehicle is None:
+        return jsonify({"msg": "Favorite not found"}), 404
+    print(remove_favorite_vehicle)
+    
+    db.session.delete(remove_favorite_vehicle)
+    db.session.commit()
+    
+    return jsonify({"msg": "Favorite deleted successfully"}), 200
+
+
+
+
 
 
  

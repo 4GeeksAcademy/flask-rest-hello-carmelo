@@ -113,7 +113,8 @@ class FavoriteCharacter(db.Model):
     def serialize(self):
         return {
             "id": self.id,
-            "character_id":self.character_id
+            "character_id":self.character_id,
+            "user_id":self.user_id
         }
     
 class FavoritePlanet(db.Model):
@@ -127,7 +128,8 @@ class FavoritePlanet(db.Model):
     def serialize(self):
         return {
             "id": self.id,
-            "planet_id":self.planet_id
+            "planet_id":self.planet_id,
+            "user_id":self.user_id
         }
     
 class FavoriteVehicle(db.Model):
@@ -141,7 +143,8 @@ class FavoriteVehicle(db.Model):
     def serialize(self):
         return {
             "id": self.id,
-            "planet_id":self.vehicle_id
+            "planet_id":self.vehicle_id,
+            "user_id":self.user_id
         }
 
 
